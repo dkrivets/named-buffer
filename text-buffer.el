@@ -15,13 +15,13 @@
 (defgroup text-buffer nil "Simply work with new buffers." :group 'applications)
 
 
-(defcustom text/name "TEMP"
+(defcustom text-prefix-name "TEMP"
   "Prefix of buffer name."
   :type 'string
   :group 'text-buffer)
 
 
-(defcustom text/splitter "-"
+(defcustom text-splitter "-"
   "Splitter of buffer name."
   :type 'string
   :group 'text-buffer)
@@ -29,13 +29,16 @@
 
 (defvar text-buffer-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-x n") #'tb-create-buffer))
+    (set-keymap-parent map text-mode-map)
+    ;;(define-key map (kbd "C-x n") #'text-buffer))
+    (define-key map (kbd "C-x n") 'tb-create-buffer)
+    map)
   "Keymap for text-buffer.")
 
 
 (defun tb-get-template-name ()
   "Get template for buffer name."
-  (concat (text/name) (text/splitter)))
+  (concat text-prefix-name text-splitter))
 
 
 (defun tb-base-create-buffer (name)
@@ -95,6 +98,16 @@
 	;; Run process
 	(tb-base-create-buffer buf-name)))))
 
+
+(define-minor-mode text-buffer
+  "TEXT-BUFFER mode."
+  :group 'text-buffer
+  :require 'text-buffer
+  :lighter " TxtBuf"
+  :keymap text-buffer-map
+  :global t
+  ;;(use-local-map text-mode-map)
+  )
 
 (provide 'text-buffer)
 ;;; text-buffer.el ends here

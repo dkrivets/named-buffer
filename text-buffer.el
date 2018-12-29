@@ -95,6 +95,6 @@
 	;; Run process
 	(tb-base-create-buffer buf-name)))))
 
-(provide 'text-buffer)
 
+(provide 'text-buffer)
 ;;; text-buffer.el ends here

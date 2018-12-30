@@ -1,27 +1,34 @@
-;;; text-buffer.el --- Options for window -*- coding: utf-8; lexical-binding: t -*-
+;;; text-buffer.el --- Creating named buffer -*- coding: utf-8; lexical-binding: t -*-
 
 ;; Author: DKrivets
 ;; Created: 29 Dec 2018
 ;; Version: 0.0.1
 ;; Keywords: text-buffer, languages, programming
 ;; Homepage: https://github.com/dkrivets/text-buffer
-;; Package-Require: ((dash "2.14.1"))
+;; Package-Require: ((emacs "24")(dash "2.14.1"))
 
 ;;; Commentary:
-;;  Simply work with new buffers
+;;  Simple way to create new buffer does not think about it name.
+;;  Have 2 parameters:
+;;  1. TEXT-PREFIX-NAME: Prefix of buffer name.
+;;  2. TEXT-SPLITTER: Splitter of buffer name.
+;;  By default, it looks like "TEMP-".
+;;  When buffer will be created it name will be "TEMP-1".
+;;  Package has an one key-binding to create a buffer: C-x n
 
 ;;; Code:
+(require 'dash)
 
-(defgroup text-buffer nil "Simply work with new buffers." :group 'applications)
+(defgroup text-buffer nil "Simple way to create new buffer does not think about it name." :group 'applications)
 
 
-(defcustom text-prefix-name "TEMP"
+(defcustom text-buffer-prefix-name "TEMP"
   "Prefix of buffer name."
   :type 'string
   :group 'text-buffer)
 
 
-(defcustom text-splitter "-"
+(defcustom text-buffer-splitter-name "-"
   "Splitter of buffer name."
   :type 'string
   :group 'text-buffer)
@@ -29,28 +36,28 @@
 
 (defvar text-buffer-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-x n") 'tb-create-buffer))
+    (define-key map (kbd "C-x n") 'text-buffer-create-buffer))
   "Keymap for text-buffer.")
 
 
-(defun tb--get-template-name ()
+(defun text-buffer--get-template-name ()
   "Get template for buffer name."
-  (concat text-prefix-name text-splitter))
+  (concat text-buffer-prefix-name text-buffer-splitter-name))
 
 
-(defun tb--base-create-buffer (name)
+(defun text-buffer--base-create-buffer (name)
   "Create buffer with NAME and switch to it."
   (switch-to-buffer (get-buffer-create name)))
 
 
-(defun tb--get-buffer-list ()
+(defun text-buffer--get-buffer-list ()
   "Get list of buffers with template name."
   (delq nil
 	(mapcar
 	 (lambda (i)
 	   (let ((buf          (buffer-name i))
-		 (template     (tb-get-template-name))
-		 (template-len (length (tb-get-template-name))))
+		 (template     (text-buffer--get-template-name))
+		 (template-len (length (text-buffer--get-template-name))))
 	     (if (< template-len (length buf))
 		 (if (string= template (substring buf 0 template-len))
 		     i
@@ -58,7 +65,7 @@
 	   (append (buffer-list) ()))))
 
 
-(defun tb--get-max-buf-num (buf-list)
+(defun text-buffer--get-max-buf-num (buf-list)
   "Get max exists bufer num with template name in BUF-LIST."
   ;; Check size of list
   ;; Return 0 or work with buffer list
@@ -68,41 +75,43 @@
      (-map
       (lambda (i)
 	;; Get exists postfix of buffer
-	(let ((num (substring (buffer-name i) (length (tb--get-template-name)))))
+	(let ((num (substring (buffer-name i) (length (text-buffer--get-template-name)))))
 	  ;; Convert postfix to number
 	  (string-to-number num)))
       buf-list))))
 
 
-(defun tb--make-default-name ()
+(defun text-buffer--make-default-name ()
   "Make default name.
 Uses format %s%d where %s - is a concatination of values
 of text-prefix-name text-splitter and %d count + 1 of same buffers."
   (format "%s%d"
 	  ;; Get template name
-	  (tb--get-template-name)
+	  (text-buffer--get-template-name)
 	  ;; Count of same buffers with apply 1
-	  (1+ (tb--get-max-buf-num (tb--get-buffer-list)))))
+	  (1+ (text-buffer--get-max-buf-num (text-buffer--get-buffer-list)))))
 
 
-(defun tb-create-buffer ()
+;;;###autoload
+(defun text-buffer-create-buffer ()
   "Create buffer with NAME interactivly.
 Main function which creates buffer with name you can input or default
 which count from exist buffer."
   (interactive)
   ;; Create user helper with buffer-name
-  (let ((desc (format "New buffer name:[%s] " (tb--make-default-name))))
+  (let ((desc (format "New buffer name:[%s] " (text-buffer--make-default-name))))
     ;; Read user data from mini-buffer
     (let ((name (read-string desc)))
       ;; Check which data we will be use: users or default
       (let ((buf-name
 	     (if (> 0 (length name))
 		 name
-	       (tb--make-default-name))))
+	       (text-buffer--make-default-name))))
 	;; Run process
-	(tb--base-create-buffer buf-name)))))
+	(text-buffer--base-create-buffer buf-name)))))
 
 
+;;;###autoload
 (define-minor-mode text-buffer
   "TEXT-BUFFER mode."
   :group 'text-buffer
@@ -110,7 +119,11 @@ which count from exist buffer."
   :lighter " TB"
   :keymap text-buffer-map
   :global t
+  (make-local-variable 'text-buffer-map)
   )
 
 (provide 'text-buffer)
+;; Local Variables:
+;; indent-tabs-mode: nil
+;; End:
 ;;; text-buffer.el ends here

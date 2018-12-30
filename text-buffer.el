@@ -1,11 +1,11 @@
 ;;; text-buffer.el --- Options for window -*- coding: utf-8; lexical-binding: t -*-
 
 ;; Author: DKrivets
-;; Created: 29 Dec 2019
-;; Version: 0.01
+;; Created: 29 Dec 2018
+;; Version: 0.0.1
 ;; Keywords: text-buffer, languages, programming
 ;; Homepage: https://github.com/dkrivets/text-buffer
-;; Package-Require: (dash.el)
+;; Package-Require: ((dash "2.14.1"))
 
 ;;; Commentary:
 ;;  Simply work with new buffers
@@ -29,10 +29,10 @@
 
 (defvar text-buffer-map
   (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map text-mode-map)
-    ;;(define-key map (kbd "C-x n") #'text-buffer))
+    ;;(set-keymap-parent map text-mode-map)
     (define-key map (kbd "C-x n") 'tb-create-buffer)
-    map)
+    ;;map
+    )
   "Keymap for text-buffer.")
 
 
@@ -51,22 +51,21 @@
   (delq nil
 	(mapcar
 	 (lambda (i)
-	   (let ((buf (buffer-name i))
-		 (template (tb-get-template-name))
+	   (let ((buf          (buffer-name i))
+		 (template     (tb-get-template-name))
 		 (template-len (length (tb-get-template-name))))
 	     (if (< template-len (length buf))
 		 (if (string= template (substring buf 0 template-len))
 		     i
-		   nil)))
-	   (append (buffer-list) ())))))
+		   nil))))
+	   (append (buffer-list) ()))))
 
 
 (defun tb-get-max-buf-num (buf-list)
   "Get max exists bufer num with template name in BUF-LIST."
-  (require 'dash)
   ;; Check size of list
   ;; Return 0 or work with buffer list
-  (if (length buf-list)
+  (if (= 0 (length buf-list))
       0
     (-max
      (-map
@@ -80,21 +79,25 @@
   "Make default name."
   (format "%s%d"
 	  (tb-get-template-name)
-	  (tb-get-max-buf-num (tb-get-buffer-list))))
+	  (1+ (tb-get-max-buf-num (tb-get-buffer-list)))))
 
 
 (defun tb-create-buffer ()
   "Create buffer with NAME interactivly."
-  (interactive)
+  (interactive )
+  (print "tb-create-buffer")
   ;; Create user helper with buffer-name
   (let ((desc (format "New buffer name:[%s] " (tb-get-default-name))))
+    (print (format "test: desc =>  %s" desc))
     ;; Read user data from mini-buffer
     (let ((name (read-string desc)))
+      (print (format "test: name => %s" name))
       ;; Check which data we will be use: users or default
       (let ((buf-name
 	     (if (> 0 (length name))
 		 name
 	       (tb-get-default-name))))
+	(print (format "test: buf-name => %s" buf-name))
 	;; Run process
 	(tb-base-create-buffer buf-name)))))
 

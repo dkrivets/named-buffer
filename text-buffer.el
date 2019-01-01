@@ -36,7 +36,8 @@
 
 (defvar text-buffer-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-x n") 'text-buffer-create-buffer))
+    (define-key map (kbd "C-x n") #'text-buffer-create-buffer)
+    map)
   "Keymap for text-buffer.")
 
 
@@ -113,14 +114,13 @@ which count from exist buffer."
 
 ;;;###autoload
 (define-minor-mode text-buffer
-  "TEXT-BUFFER mode."
+  "TEXT-BUFFER mode. For create new named buffer input \\[C-x n]."
   :group 'text-buffer
   :require 'text-buffer
   :lighter " TB"
   :keymap text-buffer-map
   :global t
-  (make-local-variable 'text-buffer-map)
-  )
+  (make-local-variable 'text-buffer-map))
 
 (provide 'text-buffer)
 ;; Local Variables:

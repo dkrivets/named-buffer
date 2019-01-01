@@ -14,7 +14,7 @@
 ;;  2. TEXT-SPLITTER: Splitter of buffer name.
 ;;  By default, it looks like "TEMP-".
 ;;  When buffer will be created it name will be "TEMP-1".
-;;  Package has an one key-binding to create a buffer: C-x n
+;;  Package has an one key-binding to create a buffer: \\[C-x n]
 
 ;;; Code:
 (require 'dash)
@@ -38,7 +38,7 @@
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-x n") #'text-buffer-create-buffer)
     map)
-  "Keymap for text-buffer.")
+  "Keymap for text-buffer: to create a buffer: \\[C-x n].")
 
 
 (defun text-buffer--get-template-name ()
@@ -121,6 +121,7 @@ which count from exist buffer."
   :keymap text-buffer-map
   :global t
   (make-local-variable 'text-buffer-map))
+
 
 (provide 'text-buffer)
 ;; Local Variables:

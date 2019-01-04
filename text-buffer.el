@@ -41,6 +41,41 @@
   "Keymap for text-buffer: to create a buffer: \\[C-x n].")
 
 
+(defvar text-buffer-optimize t
+  "Optimize make elisp byte-code or not."
+  ;;:type 'boolean
+  ;;:group 'text-buffer
+  )
+
+
+(defvar text-buffer-filename load-file-name
+  "File name of mode."
+  ;;:type 'string
+  ;;:group 'text-buffer
+  )
+
+
+(defun text-buffer--optimize ()
+  "Attempt to optimize code."
+  ;; Does we have an full file name
+  (if (< 0 (length text-buffer-filename))
+      ;; Prepare values
+      ;; Calc elc full file name and check it on exist
+      (let* ((fnm-b (concat (file-name-sans-versions text-buffer-filename) ".elc"))
+             (fnm-p (file-exists-p fnm-b)))
+        ;; If elc exist
+        (if fnm-p
+            ;; If exist but older than el-file when delete and compile
+            (if (file-newer-than-file-p fnb-b text-buffer-filename)
+                (progn
+                  (delete-file fnb-b)
+                  (byte-compile-file text-buffer-filename)))
+          ;; If not exist: compile
+          (byte-compile-file text-buffer-filename))
+        )
+    ))
+
+
 (defun text-buffer--get-template-name ()
   "Get template for buffer name."
   (concat text-buffer-prefix-name text-buffer-splitter-name))
@@ -120,7 +155,9 @@ which count from exist buffer."
   :lighter " TB"
   :keymap text-buffer-map
   :global t
-  (make-local-variable 'text-buffer-map))
+  (make-local-variable 'text-buffer-map)
+  (make-local-variable 'text-buffer-filename)
+  (text-buffer--optimize))
 
 
 (provide 'text-buffer)

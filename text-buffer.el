@@ -15,6 +15,7 @@
 ;;  By default, it looks like "TEMP-".
 ;;  When buffer will be created it name will be "TEMP-1".
 ;;  Package has an one key-binding to create a buffer: \\[C-x n]
+;; TODO delete elc file when text-buffer-optimize is false
 
 ;;; Code:
 (require 'dash)
@@ -34,6 +35,12 @@
   :group 'text-buffer)
 
 
+(defcustom text-buffer-optimize t
+  "Optimize make elisp 'byte-code' or not."
+  :type 'boolean
+  :group 'text-buffer)
+
+
 (defvar text-buffer-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-x n") #'text-buffer-create-buffer)
@@ -41,18 +48,18 @@
   "Keymap for text-buffer: to create a buffer: \\[C-x n].")
 
 
-(defvar text-buffer-optimize t
-  "Optimize make elisp byte-code or not."
-  ;;:type 'boolean
-  ;;:group 'text-buffer
-  )
-
-
 (defvar text-buffer-filename load-file-name
-  "File name of mode."
-  ;;:type 'string
-  ;;:group 'text-buffer
-  )
+  "File name of mode. But it maibe byte-code file.")
+
+
+(defun text-buffer--byte-file-name ()
+  "File name of byte code file."
+  (concat (file-name-sans-extension text-buffer-filename) ".elc"))
+
+
+(defun text-buffer--calc-file-name ()
+  "File name of code file."
+  (concat (file-name-sans-extension text-buffer-filename) ".el"))
 
 
 (defun text-buffer--optimize ()
@@ -61,17 +68,18 @@
   (if (< 0 (length text-buffer-filename))
       ;; Prepare values
       ;; Calc elc full file name and check it on exist
-      (let* ((fnm-b (concat (file-name-sans-versions text-buffer-filename) ".elc"))
-             (fnm-p (file-exists-p fnm-b)))
+      (let* ((fnm-b    (text-buffer--byte-file-name))
+             (fnm-p    (file-exists-p fnm-b))
+             (fnm-mode (text-buffer--calc-file-name)))
         ;; If elc exist
         (if fnm-p
             ;; If exist but older than el-file when delete and compile
-            (if (file-newer-than-file-p fnb-b text-buffer-filename)
+            (if (file-newer-than-file-p fnm-b fnm-mode)
                 (progn
-                  (delete-file fnb-b)
-                  (byte-compile-file text-buffer-filename)))
+                  (delete-file fnm-b)
+                  (byte-compile-file fnm-mode)))
           ;; If not exist: compile
-          (byte-compile-file text-buffer-filename))
+          (byte-compile-file fnm-mode))
         )
     ))
 
@@ -157,7 +165,20 @@ which count from exist buffer."
   :global t
   (make-local-variable 'text-buffer-map)
   (make-local-variable 'text-buffer-filename)
-  (text-buffer--optimize))
+  ;; A little bit logic on start
+  ;; Delete byte-code-file if it not used
+  (if text-buffer
+      (progn
+        (message "On start")
+        (let* ((f (file-exists-p (text-buffer--byte-file-name))))
+          (if text-buffer-optimize
+              ;; Make optimization
+              (text-buffer--optimize)
+            ;; Delete byte-code-file
+            (delete-file f))))
+    (message "On finish")
+    )
+  )
 
 
 (provide 'text-buffer)

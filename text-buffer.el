@@ -16,6 +16,7 @@
 ;;  When buffer will be created it name will be "TEMP-1".
 ;;  Package has an one key-binding to create a buffer: \\[C-x n]
 ;; TODO delete elc file when text-buffer-optimize is false
+;; TODO add internationalization
 
 ;;; Code:
 (require 'dash)
@@ -145,16 +146,15 @@ Main function which creates buffer with name you can input or default
 which count from exist buffer."
   (interactive)
   ;; Create user helper with buffer-name
-  (let ((desc (format "New buffer name:[%s] " (text-buffer--make-default-name))))
-    ;; Read user data from mini-buffer
-    (let ((name (read-string desc)))
+  (let* ((desc (format "New buffer name:[%s] " (text-buffer--make-default-name)))
+         (name (read-string desc)) ) ;; Read user data from mini-buffer
       ;; Check which data we will be use: users or default
       (let ((buf-name
 	     (if (> 0 (length name))
 		 name
 	       (text-buffer--make-default-name))))
 	;; Run process
-	(text-buffer--base-create-buffer buf-name)))))
+	(text-buffer--base-create-buffer buf-name))))
 
 
 ;;;###autoload

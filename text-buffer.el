@@ -20,24 +20,26 @@
 ;;; Code:
 (require 'dash)
 
-(defgroup text-buffer nil "Simple way to create new buffer does not think about it name." :group 'applications)
+(defgroup text-buffer nil
+  "Simple way to create new buffer does not think about it name."
+  :group 'applications)
 
 
 (defcustom text-buffer-prefix-name "TEMP"
   "Prefix of buffer name."
-  :type 'string
+  :type  'string
   :group 'text-buffer)
 
 
 (defcustom text-buffer-splitter-name "-"
   "Splitter of buffer name."
-  :type 'string
+  :type  'string
   :group 'text-buffer)
 
 
 (defcustom text-buffer-optimize t
   "Optimize make elisp 'byte-code' or not."
-  :type 'boolean
+  :type  'boolean
   :group 'text-buffer)
 
 
@@ -45,11 +47,11 @@
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-x n") #'text-buffer-create-buffer)
     map)
-  "Keymap for text-buffer: to create a buffer: \\[C-x n].")
+  "Keymap for text-buffer: to create a buffer: `\\[text-buffer-create-buffer]'.")
 
 
 (defvar text-buffer-filename load-file-name
-  "File name of mode. But it maibe byte-code file.")
+  "File name of mode.  But it maibe 'byte-code' file.")
 
 
 (defun text-buffer--byte-file-name ()
@@ -157,7 +159,16 @@ which count from exist buffer."
 
 ;;;###autoload
 (define-minor-mode text-buffer
-  "TEXT-BUFFER mode. For create new named buffer input \\[C-x n]."
+  "TEXT-BUFFER mode.
+Simple way to create new buffer does not think about it name.
+Have 2 customize parameters:
+1. TEXT-PREFIX-NAME: Prefix of buffer name.
+2. TEXT-SPLITTER: Splitter of buffer name.
+By default, it looks like \"TEMP-\".
+When the buffer will be created it name will be \"TEMP-1\".
+
+Key bindings:
+`\\{text-buffer-map}'"
   :group 'text-buffer
   :require 'text-buffer
   :lighter " TB"
@@ -168,17 +179,12 @@ which count from exist buffer."
   ;; A little bit logic on start
   ;; Delete byte-code-file if it not used
   (if text-buffer
-      (progn
-        (message "On start")
         (let* ((f (file-exists-p (text-buffer--byte-file-name))))
           (if text-buffer-optimize
               ;; Make optimization
               (text-buffer--optimize)
             ;; Delete byte-code-file
-            (delete-file f))))
-    (message "On finish")
-    )
-  )
+            (delete-file f))) ))
 
 
 (provide 'text-buffer)

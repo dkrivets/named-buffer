@@ -14,6 +14,12 @@ Have 2 customize parameters:
 
 ## Key bindings
 By default, for creating new buffer uses C-x n .
+To change key-binding there is a hook **text-buffer-load-hook** which can be used.
+```emacs-lisp
+(add-hook 'text-buffer-load-hook
+  (lambda ()
+	(define-key text-buffer-map (kbd "<f9>") #'text-buffer-create-buffer)))
+```
 
 ## Installation
 ```emacs-lisp

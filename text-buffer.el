@@ -22,8 +22,12 @@
 ;; 10 Jan 2019 Added hook \\[text-buffer-load-hook] it may help to change key binding
 ;;; Code:
 
+;;;; Requirements
 
 (require 'dash)
+
+
+;;;; Customization
 
 (defgroup text-buffer nil
   "Simple way to create new buffer does not think about it name."
@@ -54,6 +58,14 @@
   :group 'text-buffer)
 
 
+;;;; Variables
+
+(defvar text-buffer-filename load-file-name
+  "File name of mode.  But it maibe 'byte-code' file.")
+
+
+;;;;; Keymaps
+
 (defvar text-buffer-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-x n") #'text-buffer-create-buffer)
@@ -61,9 +73,7 @@
   "Keymap for text-buffer: to create a buffer: `\\[text-buffer-create-buffer]'.")
 
 
-(defvar text-buffer-filename load-file-name
-  "File name of mode.  But it maibe 'byte-code' file.")
-
+;;;; Functions
 
 (defun text-buffer--byte-file-name ()
   "File name of byte code file."
@@ -148,6 +158,7 @@ of text-prefix-name text-splitter and %d count + 1 of same buffers."
 	  ;; Count of same buffers with apply 1
 	  (1+ (text-buffer--get-max-buf-num (text-buffer--get-buffer-list)))))
 
+;;;;; Commands
 
 ;;;###autoload
 (defun text-buffer-create-buffer ()
@@ -181,9 +192,9 @@ Key bindings:
 `\\{text-buffer-map}'
 
 To change key-binding there is a hook \\[text-buffer-load-hook] which can be used.
-(add-hook 'eshell-mode-hook
+(add-hook 'text-buffer-load-hook
   (lambda ()
-    (define-key eshell-mode-map (kbd \"<f9>\") \\=#'emacs-version)))"
+    (define-key text-buffer-map (kbd \"<f9>\") \\=#'text-buffer-create-buffer)))"
   :group 'text-buffer
   :require 'text-buffer
   :lighter " TB"
@@ -203,6 +214,8 @@ To change key-binding there is a hook \\[text-buffer-load-hook] which can be use
 
 ;; Hook on load
 (run-hooks 'text-buffer-load-hook)
+
+;;;; Footer
 
 (provide 'text-buffer)
 ;; Local Variables:

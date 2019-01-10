@@ -2,7 +2,7 @@
 
 ;; Author: DKrivets
 ;; Created: 29 Dec 2018
-;; Version: 0.0.1
+;; Version: 0.0.2
 ;; Keywords: text-buffer, languages, programming
 ;; Homepage: https://github.com/dkrivets/text-buffer
 ;; Package-Require: ((emacs "24")(dash "2.14.1"))
@@ -49,7 +49,7 @@
 
 
 (defcustom text-buffer-load-hook nil
-  "A hook run once text-buffer has been loaded."
+  "A hook run once when the package has been loaded."
   :type 'hook
   :group 'text-buffer)
 
@@ -180,7 +180,10 @@ When the buffer will be created it name will be \"TEMP-1\".
 Key bindings:
 `\\{text-buffer-map}'
 
-To change key-binding there is a hook \\[text-buffer-load-hook] which can be used."
+To change key-binding there is a hook \\[text-buffer-load-hook] which can be used.
+(add-hook 'eshell-mode-hook
+  (lambda ()
+    (define-key eshell-mode-map (kbd \"<f9>\") \\=#'emacs-version)))"
   :group 'text-buffer
   :require 'text-buffer
   :lighter " TB"

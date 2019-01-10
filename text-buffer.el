@@ -17,8 +17,12 @@
 ;;  Package has an one key-binding to create a buffer: \\[C-x n]
 ;; TODO delete elc file when text-buffer-optimize is false
 ;; TODO add internationalization
-
+;;
+;; Change log:
+;; 10 Jan 2019 Added hook \\[text-buffer-load-hook] it may help to change key binding
 ;;; Code:
+
+
 (require 'dash)
 
 (defgroup text-buffer nil
@@ -41,6 +45,12 @@
 (defcustom text-buffer-optimize t
   "Optimize make elisp 'byte-code' or not."
   :type  'boolean
+  :group 'text-buffer)
+
+
+(defcustom text-buffer-load-hook nil
+  "A hook run once text-buffer has been loaded."
+  :type 'hook
   :group 'text-buffer)
 
 
@@ -168,7 +178,9 @@ By default, it looks like \"TEMP-\".
 When the buffer will be created it name will be \"TEMP-1\".
 
 Key bindings:
-`\\{text-buffer-map}'"
+`\\{text-buffer-map}'
+
+To change key-binding there is a hook \\[text-buffer-load-hook] which can be used."
   :group 'text-buffer
   :require 'text-buffer
   :lighter " TB"
@@ -186,6 +198,8 @@ Key bindings:
             ;; Delete byte-code-file
             (delete-file f))) ))
 
+;; Hook on load
+(run-hooks 'text-buffer-load-hook)
 
 (provide 'text-buffer)
 ;; Local Variables:

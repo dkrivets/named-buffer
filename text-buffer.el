@@ -2,7 +2,7 @@
 
 ;; Author: DKrivets
 ;; Created: 29 Dec 2018
-;; Version: 0.0.2
+;; Version: 0.0.3
 ;; Keywords: text-buffer, languages, programming
 ;; Homepage: https://github.com/dkrivets/text-buffer
 ;; Package-Require: ((emacs "24"))

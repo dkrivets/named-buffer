@@ -2,22 +2,22 @@
 
 ;; Author: DKrivets
 ;; Created: 29 Dec 2018
-;; Version: 0.0.3
+;; Version: 0.0.4
 ;; Keywords: text-buffer, languages, programming
 ;; Homepage: https://github.com/dkrivets/text-buffer
 ;; Package-Require: ((emacs "24"))
 
 ;;; Commentary:
 ;;  Simple way to create new buffer does not think about it name.
-;;  Have 2 parameters:
+;;  Have 1 parameter1:
 ;;  1. TEXT-PREFIX-NAME: Prefix of buffer name.
-;;  2. TEXT-SPLITTER: Splitter of buffer name.
-;;  By default, it looks like "TEMP-".
-;;  When buffer will be created it name will be "TEMP-1".
-;;  Package has an one key-binding to create a buffer: \\[C-x n]
+;;  By default, it looks like "TEMP".
+;;  When buffer will be created it name will be "TEMP".
+;;  And the next buffer will have a name like "TEMP<2>".
 ;; TODO add internationalization
 ;;
 ;; Change log:
+;; 09 Feb 2019 Deleted text-buffer-load-hook and default key binding
 ;; 11 Jan 2019 Simplify algorithm: idea from alphapapa
 ;; 10 Jan 2019 Added hook \\[text-buffer-load-hook] it may help to change key binding
 ;;; Code:
@@ -38,23 +38,6 @@
   :group 'text-buffer)
 
 
-(defcustom text-buffer-load-hook nil
-  "A hook run once when the package has been loaded."
-  :type 'hook
-  :group 'text-buffer)
-
-
-;;;; Variables
-
-;;;;; Keymaps
-
-(defvar text-buffer-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-x n") #'text-buffer-create-buffer)
-    map)
-  "Keymap for text-buffer: to create a buffer: `\\[text-buffer-create-buffer]'.")
-
-
 ;;;; Functions
 
 (defun text-buffer--base-create-buffer (name)
@@ -72,7 +55,7 @@ If NAME is null generate new name base on `text-buffer-prefix-name'."
 ;;;;; Commands
 
 ;;;###autoload
-(defun text-buffer-create-buffer ()
+(defun text-buffer-create ()
   "Create buffer with NAME interactivly.
 Main function which creates buffer with name you can input or default
 which count from exist buffer."
@@ -89,28 +72,22 @@ which count from exist buffer."
 (define-minor-mode text-buffer
   "TEXT-BUFFER mode.
 Simple way to create new buffer does not think about it name.
-Have 2 customize parameters:
+Have 1 customize parameters:
 1. TEXT-PREFIX-NAME: Prefix of buffer name.
-By default, it looks like \"TEMP-\".
-When the buffer will be created it name will be \"TEMP-1\".
+By default, it looks like \"TEMP\".
+When the buffer will be created it name will be \"TEMP\" and next \"TEMP<2>\".
 
-Key bindings:
-`\\{text-buffer-map}'
-
-To change key-binding there is a hook \\[text-buffer-load-hook] which can be used.
-(add-hook 'text-buffer-load-hook
-  (lambda ()
-    (define-key text-buffer-map (kbd \"<f9>\") \\=#'text-buffer-create-buffer)))"
+Example:
+(require 'text-buffer)
+(text-buffer)
+(global-set-key (kbd \"C-x n\") #'text-buffer-create)
+"
   :group 'text-buffer
   :require 'text-buffer
   :lighter " TB"
-  :keymap text-buffer-map
   :global t
   (make-local-variable 'text-buffer-map)
 )
-
-;; Hook on load
-(run-hooks 'text-buffer-load-hook)
 
 ;;;; Footer
 

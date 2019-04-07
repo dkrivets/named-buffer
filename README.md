@@ -15,5 +15,5 @@ Have 1 customize parameters:
 ```emacs-lisp
 (require 'named-buffer)
 (named-buffer)
-(global-set-key (kbd "C-x n") #'named-buffer-create)
+(global-set-key (kbd "C-x n n") #'named-buffer-create)
 ```
